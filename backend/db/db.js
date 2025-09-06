@@ -1,8 +1,8 @@
-const {Pool}= require("pg");
+const { Pool } = require("pg");
+require("dotenv").config();
 
-const pool=new Pool({
-    connectionString:"postgresql://postgres:axios@localhost:5432/Odoo1?sslmode=disable"
-})
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+});
 
-module.exports=pool;
-
+module.exports = pool;

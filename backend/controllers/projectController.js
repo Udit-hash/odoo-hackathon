@@ -1,12 +1,9 @@
 const ProjectModel = require('../models/Project.js');
-const UserModel = require('../models/user.js'); // Required to find users by email
+const UserModel = require('../models/user.js');
 
-/**
- * Creates a new project. The logged-in user becomes the manager.
- */
 const createProject = async (req, res) => {
     try {
-        const managerEmail = req.email; // From authMiddleware
+        const managerEmail = req.email;
         const manager = await UserModel.findByEmail(managerEmail);
         if (!manager) {
             return res.status(404).json({ message: "Authenticated user not found." });
@@ -24,9 +21,6 @@ const createProject = async (req, res) => {
     }
 };
 
-/**
- * Gets all projects that the logged-in user is a member of.
- */
 const getMyProjects = async (req, res) => {
     try {
         const user = await UserModel.findByEmail(req.email);
@@ -37,9 +31,6 @@ const getMyProjects = async (req, res) => {
     }
 };
 
-/**
- * Gets the details of a single project by its ID.
- */
 const getProjectById = async (req, res) => {
     try {
         const { projectId } = req.params;
@@ -48,9 +39,6 @@ const getProjectById = async (req, res) => {
         if (!project) {
             return res.status(404).json({ message: "Project not found." });
         }
-        
-        // In a real app, you would add a security check here to ensure
-        // the logged-in user is a member of this project before returning it.
 
         res.status(200).json(project);
     } catch (error) {
@@ -58,35 +46,24 @@ const getProjectById = async (req, res) => {
     }
 };
 
-/**
- * Adds a new member to a project.
- */
 const addProjectMember = async (req, res) => {
     try {
         const { projectId } = req.params;
-        const { email } = req.body; // Email of the user to add
+        const { email } = req.body;
 
-        // Find the user you want to add by their email
         const userToAdd = await UserModel.findByEmail(email);
         if (!userToAdd) {
             return res.status(404).json({ message: "User to be added not found." });
         }
 
-        // In a real app, you'd also check if the person making the request
-        // is the manager of this project before allowing them to add members.
-
         const newMember = await ProjectModel.addMember(projectId, userToAdd.user_id);
         res.status(201).json({ message: "User added to project successfully!", membership: newMember });
 
     } catch (error) {
-        // This will catch errors, including if the user is already a member
         res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
 
-/**
- * Gets a list of all members for a specific project.
- */
 const getProjectMembers = async (req, res) => {
     try {
         const { projectId } = req.params;
@@ -96,7 +73,6 @@ const getProjectMembers = async (req, res) => {
         res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
-
 
 module.exports = {
     createProject,

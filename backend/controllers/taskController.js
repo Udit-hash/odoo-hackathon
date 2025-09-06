@@ -1,24 +1,20 @@
-const TaskModel = require('../models/Task.js');
+const TaskModel = require('../models/taskModel.js');
 const UserModel = require('../models/user.js');
-const ProjectModel = require('../models/Project.js'); // Needed for permission checks
+const ProjectModel = require('../models/projectModel.js');
+const { getIO, userSockets } = require('../socket');
 
-/**
- * Creates a new task and assigns it.
- */
 const createTask = async (req, res) => {
     try {
-        const creatorEmail = req.email; // From authMiddleware
+        const creatorEmail = req.email;
         const creator = await UserModel.findByEmail(creatorEmail);
 
         const { title, description, status = 'To-Do', projectId, assigneeId, dueDate, imageUrl, tags } = req.body;
 
-        // Security Check: Ensure the person creating the task is a member of the project.
         const isCreatorMember = await ProjectModel.isProjectMember(projectId, creator.user_id);
         if (!isCreatorMember) {
             return res.status(403).json({ message: "Forbidden: You are not a member of this project." });
         }
 
-        // Security Check: Ensure the assignee is also a member of the project.
         if (assigneeId) {
             const isAssigneeMember = await ProjectModel.isProjectMember(projectId, assigneeId);
             if (!isAssigneeMember) {
@@ -26,8 +22,31 @@ const createTask = async (req, res) => {
             }
         }
 
-        const taskData = { title, description, status, projectId, assigneeId, createdById: creator.user_id, dueDate, imageUrl };
+        const taskData = { 
+            title, 
+            description, 
+            status, 
+            projectId, 
+            assigneeId, 
+            createdById: creator.user_id, 
+            dueDate, 
+            imageUrl 
+        };
+
         const newTask = await TaskModel.create(taskData, tags);
+
+        if (assigneeId) {
+            const recipientSocketId = userSockets[assigneeId];
+            if (recipientSocketId) {
+                const io = getIO();
+                const notification = {
+                    message: `You have been assigned a new task: "${newTask.title}"`,
+                    taskId: newTask.task_id,
+                    projectId: newTask.project_id
+                };
+                io.to(recipientSocketId).emit('new_task_assigned', notification);
+            }
+        }
 
         res.status(201).json({ message: "Task created successfully!", task: newTask });
     } catch (error) {
@@ -35,9 +54,6 @@ const createTask = async (req, res) => {
     }
 };
 
-/**
- * Gets all tasks assigned to the logged-in user.
- */
 const getMyTasks = async (req, res) => {
     try {
         const user = await UserModel.findByEmail(req.email);
@@ -51,15 +67,11 @@ const getMyTasks = async (req, res) => {
     }
 };
 
-/**
- * Gets all tasks for a specific project.
- */
 const getProjectTasks = async (req, res) => {
     try {
         const { projectId } = req.params;
         const user = await UserModel.findByEmail(req.email);
 
-        // Security Check: Ensure the user requesting the tasks is a member of the project.
         const isMember = await ProjectModel.isProjectMember(projectId, user.user_id);
         if (!isMember) {
             return res.status(403).json({ message: "Forbidden: You are not a member of this project." });
