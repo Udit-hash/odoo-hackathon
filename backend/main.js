@@ -9,6 +9,6 @@ app.use(express.json());
 
 app.use("/api/v1",MainRouter);
 
-app.listen(3000,()=>{
+app.listen(3001,()=>{
     console.log("Server connected");
 });

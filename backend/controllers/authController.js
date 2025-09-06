@@ -3,7 +3,10 @@ const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const UserModel = require('../models/user.js');
 
+// ⚠ For testing only. In a real app, this MUST be in a .env file.
+const JWT_SECRET = 'mysecretpassword'; 
 
+// ## 1. SIGN UP A NEW USER ##
 const signupUser = async (req, res) => {
     try {
         const { firstName, lastName, email, password } = req.body;
@@ -56,7 +59,8 @@ const signinUser = async (req, res) => {
             return res.status(401).json({ message: "Invalid email or password." });
         }
 
-        const payload = { email: user.email };
+        // The token payload contains the user's permanent, unique ID.
+        const payload = { email: user.user_id };
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
 
         res.status(200).json({
@@ -73,7 +77,7 @@ const signinUser = async (req, res) => {
 const getLoggedInUserProfile = async (req, res) => {
     try {
         // The user's ID is attached to the request by the authMiddleware
-        const userId = req.email;
+        const userId = req.userId;
 
         const userProfile = await UserModel.findById(userId);
 

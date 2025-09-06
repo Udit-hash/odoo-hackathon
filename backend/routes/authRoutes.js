@@ -1,33 +1,16 @@
-import express from 'express';
-import {
+const express = require("express");
+const {
   signupUser,
   signinUser,
   getLoggedInUserProfile,
+} = require("../controllers/authController.js");
 
-} from '../controllers/authController.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
+const { authMiddleware } = require("../middleware/authMiddleware.js");
 
 const router = express.Router();
 
+router.post("/signup", signupUser);
+router.post("/signin", signinUser);
+router.get("/me", authMiddleware, getLoggedInUserProfile);
 
-router.post('/signup', signupUser);
-
-// @desc    Authenticate (sign in) a user and get a token
-// @route   POST /api/users/signin
-// @access  Public
-router.post('/signin', signinUser);
-
-
-// ====================================================================
-// ## PRIVATE ROUTES (Login required) ##
-// ====================================================================
-
-// @desc    Get the profile of the currently logged-in user
-// @route   GET /api/users/me
-// @access  Private
-router.get('/me', authMiddleware, getLoggedInUserProfile);
-
-
-
-
-export default router;
+module.exports = router;

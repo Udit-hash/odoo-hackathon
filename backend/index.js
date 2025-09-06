@@ -1,12 +1,12 @@
 const express=require ('express');
-const UserRouter=require('./authRoutes.js');
+const UserRouter=require('./routes/authRoutes');
 
 const router=express.Router();
 
 router.use('/user',UserRouter);
-router.use('/Project',ProjectRouter);
-router.use('/Task',TaskModel);
-router.use('/Comments',CommentsModel);
+// router.use('/Project',ProjectRouter);
+// router.use('/Task',TaskModel);
+// router.use('/Comments',CommentsModel);
 
 
 module.exports=router;

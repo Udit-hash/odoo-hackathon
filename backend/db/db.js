@@ -1,8 +1,8 @@
-import {Pool} from 'pg'
+const {Pool}= require("pg");
 
 const pool=new Pool({
-    connectionString:"postgresql://postgres:axios@localhost:5432/mydatabase?sslmode=disable"
+    connectionString:"postgresql://postgres:axios@localhost:5432/Odoo1?sslmode=disable"
 })
 
-export default pool;
+module.exports=pool;
 
