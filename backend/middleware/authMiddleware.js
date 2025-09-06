@@ -6,7 +6,7 @@ const authMiddleware=(req,res,next)=>{
     const authHeader=req.headers.authorization;
 
     if(!authHeader || !authHeader.startsWith("Bearer")){
-        return res.status(411).json({
+        return res.status(401).json({
             msg:"User authorization failed"
         })
     }
@@ -19,7 +19,7 @@ const authMiddleware=(req,res,next)=>{
             req.email=decoded.email;
             next();
         }else{
-            return res.status(411).json({
+            return res.status(401).json({
                 msg:"User authorization failed"
 
             })
