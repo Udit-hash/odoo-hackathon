@@ -1,4 +1,5 @@
 const express=require ('express');
+const UserRouter=require('./authRoutes.js');
 
 const router=express.Router();
 
