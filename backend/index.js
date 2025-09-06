@@ -1,6 +1,6 @@
 const express=require ('express');
 const UserRouter=require('./routes/authRoutes');
-const ProjectRouter=require('./projectRoute.js');
+const ProjectRouter=require('./routes/projectRoutes.js');
 
 const router=express.Router();
 

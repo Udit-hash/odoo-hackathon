@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const UserModel = require('../models/user.js');
+const { email } = require('zod/v4');
 
 
 const JWT_SECRET = 'mysecretpassword'; 
@@ -60,7 +61,7 @@ const signinUser = async (req, res) => {
         }
 
         
-        const payload = { email: user.user_id };
+        const payload = { email: user.email };
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
 
         res.status(200).json({
@@ -77,9 +78,9 @@ const signinUser = async (req, res) => {
 const getLoggedInUserProfile = async (req, res) => {
     try {
        
-        const userId = req.userId;
+        const userId = req.email;
 
-        const userProfile = await UserModel.findById(userId);
+        const userProfile = await UserModel.findById(email);
 
         if (!userProfile) {
             return res.status(404).json({ message: "User not found." });

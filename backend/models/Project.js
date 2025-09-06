@@ -1,13 +1,9 @@
-const pool = require('../config/db.js');
+const pool = require('../db/db.js');
 
 const ProjectModel = {
-    /**
-     * Creates a new project, adds the creator as a member, and links any tags.
-     * Uses a transaction to ensure all or none of the operations succeed.
-     * @param {object} projectData Contains name, description, managerId, etc.
-     * @param {Array<string>} tagIds Array of UUIDs for the tags.
-     * @returns {Promise<object>} The newly created project object.
-     */
+   
+    //   Creates a new project, adds the creator as a member, and links any tags.
+   
     async create(projectData, tagIds = []) {
         const { projectName, description, managerId, deadline, priority, imageUrl } = projectData;
         
