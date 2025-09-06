@@ -1,6 +1,8 @@
-import {Client} from 'pg'
+import {Pool} from 'pg'
 
-const client=new Client({
-    
+const pool=new Pool({
+    connectionString:"postgresql://postgres:axios@localhost:5432/mydatabase?sslmode=disable"
 })
+
+export default pool;
 
