@@ -86,6 +86,18 @@ const ProjectModel = {
         `;
         const result = await pool.query(query, [projectId]);
         return result.rows;
+    },
+
+    /**
+     * Checks if a user is a member of a project.
+     * @param {string} projectId The ID of the project.
+     * @param {string} userId The ID of the user.
+     * @returns {Promise<boolean>} True if the user is a member, false otherwise.
+     */
+    async isProjectMember(projectId, userId) {
+        const query = `SELECT COUNT(*) FROM project_members WHERE project_id = $1 AND user_id = $2`;
+        const result = await pool.query(query, [projectId, userId]);
+        return parseInt(result.rows[0].count, 10) > 0;
     }
 };
 

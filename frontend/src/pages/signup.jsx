@@ -54,8 +54,8 @@ export const Signup=()=>{
               email,
               password
             });
-            localStorage.setItem("token", response.data.token)
-            alert("succesfull");
+             alert("Signup successful! Please sign in.");
+            navigate("/signin"); 
           }} label={"Sign up"} />
         </div>
 

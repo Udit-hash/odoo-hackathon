@@ -1,4 +1,4 @@
-const ProjectModel = require('../models/projectModel.js');
+const ProjectModel = require('../models/Project.js');
 const UserModel = require('../models/user.js'); // Required to find users by email
 
 /**

@@ -1,57 +1,79 @@
-const TaskModel = require('../models/taskModel.js');
+const TaskModel = require('../models/Task.js');
 const UserModel = require('../models/user.js');
-const ProjectModel = require('../models/projectModel.js'); // Needed for permission checks
+const ProjectModel = require('../models/Project.js'); // Needed for permission checks
 
+/**
+ * Creates a new task and assigns it.
+ */
 const createTask = async (req, res) => {
     try {
-        const creatorEmail = req.email; // Email of the logged-in user creating the task
+        const creatorEmail = req.email; // From authMiddleware
         const creator = await UserModel.findByEmail(creatorEmail);
 
-        const {
-            title,
-            description,
-            status = 'To-Do', // Default to 'To-Do' if not provided
-            projectId,
-            assigneeId, // The user_id of the person the task is assigned to
-            dueDate,
-            imageUrl,
-            tags // An array of tag_ids
-        } = req.body;
+        const { title, description, status = 'To-Do', projectId, assigneeId, dueDate, imageUrl, tags } = req.body;
 
-        // --- Security Checks ---
-        // 1. Check if the creator is a member of the project.
+        // Security Check: Ensure the person creating the task is a member of the project.
         const isCreatorMember = await ProjectModel.isProjectMember(projectId, creator.user_id);
         if (!isCreatorMember) {
             return res.status(403).json({ message: "Forbidden: You are not a member of this project." });
         }
 
-        // 2. If assigning to someone, check if the assignee is also a member of the project.
+        // Security Check: Ensure the assignee is also a member of the project.
         if (assigneeId) {
             const isAssigneeMember = await ProjectModel.isProjectMember(projectId, assigneeId);
             if (!isAssigneeMember) {
-                return res.status(400).json({ message: "Invalid assignee: The user you are assigning this task to is not a member of this project." });
+                return res.status(400).json({ message: "Invalid assignee: User is not a member of this project." });
             }
         }
 
-        const taskData = {
-            title,
-            description,
-            status,
-            projectId,
-            assigneeId,
-            createdById: creator.user_id, // The logged-in user is the creator
-            dueDate,
-            imageUrl
-        };
-        
+        const taskData = { title, description, status, projectId, assigneeId, createdById: creator.user_id, dueDate, imageUrl };
         const newTask = await TaskModel.create(taskData, tags);
 
-        res.status(201).json({ message: "Task created and assigned successfully!", task: newTask });
+        res.status(201).json({ message: "Task created successfully!", task: newTask });
+    } catch (error) {
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+};
+
+/**
+ * Gets all tasks assigned to the logged-in user.
+ */
+const getMyTasks = async (req, res) => {
+    try {
+        const user = await UserModel.findByEmail(req.email);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        const tasks = await TaskModel.findTasksByAssigneeId(user.user_id);
+        res.status(200).json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+};
+
+/**
+ * Gets all tasks for a specific project.
+ */
+const getProjectTasks = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        const user = await UserModel.findByEmail(req.email);
+
+        // Security Check: Ensure the user requesting the tasks is a member of the project.
+        const isMember = await ProjectModel.isProjectMember(projectId, user.user_id);
+        if (!isMember) {
+            return res.status(403).json({ message: "Forbidden: You are not a member of this project." });
+        }
+
+        const tasks = await TaskModel.findTasksByProjectId(projectId);
+        res.status(200).json(tasks);
     } catch (error) {
         res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
 
 module.exports = {
-    createTask
+    createTask,
+    getMyTasks,
+    getProjectTasks
 };

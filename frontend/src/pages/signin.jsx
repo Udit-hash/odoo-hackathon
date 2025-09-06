@@ -34,7 +34,7 @@ export const Signin = () => {
                     email,
                     password
           });
-                localStorage.setItem("token",response.data.token);
+                localStorage.setItem("authToken", response.data.token);
                 navigate("/dashboard")
           }} label={"Sign in"} />
         </div>
