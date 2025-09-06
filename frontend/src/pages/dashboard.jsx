@@ -1,97 +1,79 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { api } from '../services/api'; 
-import { CreateProjectModal } from "../components/CreateProjectModal";
 
-export function DashboardPage() { 
-    const [projects, setProjects] = useState([]);
-    const [myTasks, setMyTasks] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [projectsResponse, tasksResponse] = await Promise.all([
-                    api.get('/projects'), 
-                    api.get('/tasks')      
-                ]);
-                setProjects(projectsResponse.data);
-                setMyTasks(tasksResponse.data);
-            } catch (err) {
-                setError('Failed to load data. Please try refreshing the page.');
-                console.error(err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    const handleProjectCreated = (newProject) => {
-        setProjects([newProject, ...projects]);
-    };
-
-    if (isLoading) return <div className="p-8 text-center">Loading your dashboard...</div>;
-    if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
-
-    return (
-        <div className="p-8 bg-gray-50 min-h-screen">
-            <header className="flex justify-between items-center mb-8">
-                <h1 className="text-4xl font-bold text-gray-800">Dashboard</h1>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow"
-                >
-                    + New Project
-                </button>
-            </header>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Projects Section */}
-                <section>
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-700">My Projects</h2>
-                    <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
-                        {projects.length > 0 ? (
-                            projects.map(project => (
-                                <Link to={`/project/${project.project_id}`} key={project.project_id} className="block p-4 border rounded-lg hover:bg-gray-100 hover:shadow-sm transition-all">
-                                    <h3 className="font-bold text-lg text-blue-600">{project.project_name}</h3>
-                                    <p className="text-sm text-gray-600">{project.description}</p>
-                                </Link>
-                            ))
-                        ) : (
-                            <p className="text-gray-500">You are not a member of any projects yet.</p>
-                        )}
-                    </div>
-                </section>
-
-                {/* My Tasks Section */}
-                <section>
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-700">My Tasks</h2>
-                    <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
-                        {myTasks.length > 0 ? (
-                            myTasks.map(task => (
-                                <div key={task.task_id} className="p-4 border rounded-lg">
-                                    <h3 className="font-bold text-lg">{task.title}</h3>
-                                    <p className="text-sm text-gray-500">Status: {task.status}</p>
-                                    {task.due_date && <p className="text-sm text-red-500">Due: {new Date(task.due_date).toLocaleDateString()}</p>}
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-gray-500">You have no tasks assigned to you.</p>
-                        )}
-                    </div>
-                </section>
-            </div>
-
-            {isModalOpen && (
-                <CreateProjectModal
-                    onClose={() => setIsModalOpen(false)}
-                    onProjectCreated={handleProjectCreated}
-                />
-            )}
+export const Dashboard = () => {
+  return (
+    <div className="h-screen w-screen flex bg-gray-50 font-sans">
+      {/* Sidebar */}
+      <div className="w-64 bg-white border-r flex flex-col justify-between">
+        <div>
+          <div className="p-4 text-xl font-bold">Company</div>
+          <div className="px-4 mt-6 space-y-4">
+            <div className="text-gray-800 font-semibold cursor-pointer">Projects</div>
+            <div className="text-gray-600 cursor-pointer">My Tasks</div>
+          </div>
         </div>
-    );
+        <div className="p-4 flex items-center space-x-3 border-t">
+          <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+          <div>
+            <p className="text-sm font-semibold">Test User</p>
+            <p className="text-xs text-gray-500">user@gmail.com</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Topbar */}
+        <div className="h-16 bg-white border-b flex items-center justify-between px-6">
+          <div className="text-sm text-gray-500">Projects</div>
+          <div className="flex items-center space-x-3">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="px-3 py-1 border rounded-md text-sm"
+            />
+            <button className="px-4 py-2 bg-blue-500 text-white rounded-md">
+              New Project
+            </button>
+          </div>
+        </div>
+
+        {/* Cards Section */}
+        <div className="p-6 grid grid-cols-3 gap-6">
+          {/* Card 1 */}
+          <div className="bg-white border rounded-lg shadow p-4">
+            <div className="text-sm text-green-600 font-semibold mb-2">
+              Completed
+            </div>
+            <div className="h-32 bg-gray-200 flex items-center justify-center">
+              Project Image
+            </div>
+            <div className="mt-3 text-gray-800 font-semibold">90 Sentences</div>
+          </div>
+
+          {/* Card 2 */}
+          <div className="bg-white border rounded-lg shadow p-4">
+            <div className="text-sm text-red-600 font-semibold mb-2">
+              In Progress
+            </div>
+            <div className="h-32 bg-gray-200 flex items-center justify-center">
+              Project Image
+            </div>
+            <div className="mt-3 text-gray-800 font-semibold">50 Segments</div>
+          </div>
+
+          {/* Card 3 */}
+          <div className="bg-white border rounded-lg shadow p-4">
+            <div className="text-sm text-yellow-600 font-semibold mb-2">
+              Review
+            </div>
+            <div className="h-32 bg-gray-200 flex items-center justify-center">
+              Project Image
+            </div>
+            <div className="mt-3 text-gray-800 font-semibold">42 Annotations</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
