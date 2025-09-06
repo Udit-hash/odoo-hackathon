@@ -27,7 +27,7 @@ export function CreateProjectModal({ onClose, onProjectCreated }) {
             <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
                 <h2 className="text-2xl font-bold mb-4">Create New Project</h2>
                 <form onSubmit={handleSubmit}>
-                    {/* Form content from your code is correct */}
+                  
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">Project Name</label>
                         <input type="text" value={projectName} onChange={(e) => setProjectName(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" />

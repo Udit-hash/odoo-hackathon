@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../services/api'; 
 import { CreateProjectModal } from "../components/CreateProjectModal";
 
-export function DashboardPage() { // Changed to an exported function to match import
+export function DashboardPage() { 
     const [projects, setProjects] = useState([]);
     const [myTasks, setMyTasks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -14,8 +14,8 @@ export function DashboardPage() { // Changed to an exported function to match im
         const fetchData = async () => {
             try {
                 const [projectsResponse, tasksResponse] = await Promise.all([
-                    api.get('/projects'), // Gets projects the user is a member of
-                    api.get('/tasks')      // Gets tasks assigned to the user
+                    api.get('/projects'), 
+                    api.get('/tasks')      
                 ]);
                 setProjects(projectsResponse.data);
                 setMyTasks(tasksResponse.data);

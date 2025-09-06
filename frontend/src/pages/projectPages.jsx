@@ -42,11 +42,11 @@ export function ProjectPage() {
             <header className="mb-8">
                 <h1 className="text-4xl font-bold text-gray-800">{project?.project_name}</h1>
                 <p className="text-lg text-gray-600 mt-2">{project?.description}</p>
-                {/* Add functional buttons for modals here */}
+                
             </header>
 
             <main className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Kanban Columns */}
+                
                 {['To-Do', 'In Progress', 'Done'].map(status => (
                     <div key={status} className="bg-gray-200 p-4 rounded-lg">
                         <h2 className="font-bold text-xl mb-4">{status}</h2>
